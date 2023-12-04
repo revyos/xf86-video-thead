@@ -26,20 +26,13 @@
 #define ARMADA_NAME		"armada"
 #define ARMADA_DRIVER_NAME	"armada"
 
-#define DRM_MODULE_NAMES	"armada-drm", "imx-drm"
+#define DRM_MODULE_NAMES	"vs-drm"
 #define DRM_DEFAULT_BUS_ID	NULL
 
 static const char *drm_module_names[] = { DRM_MODULE_NAMES };
 
-/* Supported "chipsets" */
-static SymTabRec armada_chipsets[] = {
-//	{  0, "88AP16x" },
-	{  0, "88AP510" },
-	{ -1, NULL }
-};
-
-static SymTabRec ipu_chipsets[] = {
-	{  0, "i.MX6" },
+static SymTabRec thead_chipsets[] = {
+	{  0, "TH1520" },
 	{ -1, NULL }
 };
 
@@ -111,10 +104,8 @@ void armada_register_accel(const struct armada_accel_ops *ops, pointer module,
 
 static void armada_identify(int flags)
 {
-	xf86PrintChipsets(ARMADA_NAME, "Support for Marvell LCD Controller",
-			  armada_chipsets);
-	xf86PrintChipsets(ARMADA_NAME, "Support for Freescale IPU",
-			  ipu_chipsets);
+	xf86PrintChipsets(ARMADA_NAME, "Support for T-Head SoCs",
+			  thead_chipsets);
 }
 
 static void armada_init_screen(ScrnInfoPtr pScrn)
