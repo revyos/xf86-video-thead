@@ -104,6 +104,7 @@ XORG_DRIVER_CHECK_EXT(XV, videoproto)
 
 # Obtain compilter/linker options for the driver dependencies
 PKG_CHECK_MODULES(DRM, [libdrm >= 2.4.47])
+PKG_CHECK_MODULES(GBM, [gbm >= 17.1.0])
 
 PKG_CHECK_MODULES(DRI2, [dri2proto >= 2.6], , DRI2=no)
 
