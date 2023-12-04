@@ -51,20 +51,6 @@ ETNA_COMMON_SOURCES += \
 	etnaviv_dri3.h
 endif
 
-if HAVE_ACCEL_ETNAVIV
-etnaviv_gpu_la_LTLIBRARIES = etnaviv_gpu.la
-etnaviv_gpu_la_LDFLAGS = -module -avoid-version
-etnaviv_gpu_la_LIBADD = \
-	$(ETNAVIV_LIBS) \
-	$(ETNA_COMMON_LIBADD)
-etnaviv_gpu_ladir = @moduledir@/drivers
-etnaviv_gpu_la_SOURCES = \
-	$(ETNA_COMMON_SOURCES) \
-	etnaviv_dummy.c \
-	etnaviv_emit.c \
-	etnaviv_module.c
-endif
-
 if HAVE_ACCEL_ETNADRM
 etnadrm_gpu_la_LTLIBRARIES = etnadrm_gpu.la
 etnadrm_gpu_la_LDFLAGS = -module -avoid-version

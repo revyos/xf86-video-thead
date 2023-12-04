@@ -75,54 +75,6 @@ AC_ARG_WITH(xorg-module-dir,
             [moduledir="$withval"],
             [moduledir="$libdir/xorg/modules"])
 
-# Vivante GPU acceleration using libGAL
-AC_ARG_ENABLE(vivante,
-	      AC_HELP_STRING([--enable-vivante],
-			     [Enable Vivante libGAL acceleration support [[default=disabled]]]),
-	      [ACCEL_GALCORE="$enableval"],
-	      [ACCEL_GALCORE=no])
-
-AC_ARG_WITH(libgal-include,
-            AC_HELP_STRING([--with-libgal-include=PATH],
-                           [specify directory for installed libGAL include files [[default=/usr/local/include/HAL]]]),
-            [libgal_include="$withval"],
-            [libgal_include="/usr/local/include/HAL"])
-
-AC_ARG_WITH(libgal-lib,
-            AC_HELP_STRING([--with-libgal-lib=PATH],
-                           [specify directory for installed libGAL library [[default=/usr/local/lib]]]),
-            [libgal_lib="$withval"],
-            [libgal_lib="/usr/local/lib"])
-
-AS_IF([test x$ACCEL_GALCORE != xno],
-      [
-   LIBGAL_CFLAGS="-I$libgal_include"
-   LIBGAL_LIBS="-L$libgal_lib -lGAL"
-
-   saved_CPPFLAGS="$CPPFLAGS"
-   CPPFLAGS="$CPPFLAGS $LIBGAL_CFLAGS"
-   AC_CHECK_HEADERS([gc_hal.h gc_hal_base.h gc_hal_enum.h],
-                    [],
-                    AS_IF([test x$ACCEL_GALCORE = xyes],
-                          [AC_MSG_ERROR([required libGAL header file missing])],
-			  [ACCEL_GALCORE=no]))
-   AC_CHECK_HEADERS([gc_hal_raster.h],
-                    [],
-                    AS_IF([test x$ACCEL_GALCORE = xyes],
-                          [AC_MSG_ERROR([required libGAL header file missing])],
-			  [ACCEL_GALCORE=no]),
-                    [#include <gc_hal.h>])
-   CPPFLAGS="$saved_CPPFLAGS"
-   AS_IF([test x$ACCEL_GALCORE = xauto], [ACCEL_GALCORE=yes])
-   AS_IF([test x$ACCEL_GALCORE = xyes], [DRIVERS="vivante_gpu $DRIVERS"])
-])
-AC_MSG_CHECKING([whether to build Vivante libGAL acceleration support])
-AS_IF([test x$ACCEL_GALCORE = xyes],
-      [AC_DEFINE(HAVE_ACCEL_GALCORE,1,[Enable Vivante libGAL acceleration support])])
-AM_CONDITIONAL(HAVE_ACCEL_GALCORE, test x$ACCEL_GALCORE = xyes)
-AC_MSG_RESULT([$ACCEL_GALCORE])
-
-
 # Etnaviv GPU acceleration
 AC_ARG_ENABLE(etnadrm,
 	      AC_HELP_STRING([--disable-etnadrm],
@@ -130,28 +82,12 @@ AC_ARG_ENABLE(etnadrm,
 	      [ACCEL_ETNADRM="$enableval"],
 	      [ACCEL_ETNADRM=auto])
 
-AC_ARG_ENABLE(etnaviv,
-	      AC_HELP_STRING([--enable-etnaviv],
-			     [Enable Etnaviv (GALcore kernel driver) acceleration support [[default=disabled]]]),
-	      [ACCEL_ETNAVIV="$enableval"],
-	      [ACCEL_ETNAVIV=no])
-
 AC_ARG_WITH(etnaviv-source,
             AC_HELP_STRING([--with-etnaviv-source=PATH],
                            [specify directory for etnaviv source tree [[default=unset]]]),
             [etnaviv_source="$withval"])
 
-AC_ARG_WITH(etnaviv-include,
-            AC_HELP_STRING([--with-etnaviv-include=PATH],
-                           [specify directory for installed etnaviv include files [[default=unset]]]),
-            [etnaviv_include="$withval"])
-
-AC_ARG_WITH(etnaviv-lib,
-            AC_HELP_STRING([--with-etnaviv-lib=PATH],
-                           [specify directory for installed etnaviv library [[default=unset]]]),
-            [etnaviv_lib="$withval"])
-
-AS_IF([test x$ACCEL_ETNAVIV != xno || test x$ACCEL_ETNADRM != xno],
+AS_IF([test x$ACCEL_ETNADRM != xno],
       [
    AS_IF([test x$etnaviv_source != x],
          [
@@ -189,35 +125,10 @@ AS_IF([test x$ACCEL_ETNAVIV != xno || test x$ACCEL_ETNADRM != xno],
    LDFLAGS="$LDFLAGS $ETNAVIV_LIBS"
    CFLAGS="$CFLAGS $ETNAVIV_CFLAGS"
    AS_IF([test x$ACCEL_ETNADRM = xauto], [ACCEL_ETNADRM=yes], [ACCEL_ETNADRM=no])
-   AS_IF([test x$ACCEL_ETNAVIV != xno],
-         [
-      AC_CHECK_LIB([etnaviv], [viv_open],
-                   [AS_IF([test x$ACCEL_ETNAVIV = xauto],
-			  [ACCEL_ETNAVIV=yes],
-			  [
-                       AC_MSG_ERROR([etnaviv (GALcore kernel driver) support requires libetnaviv library])
-                    ])],
-                   [ACCEL_ETNAVIV=no])
-   ])
-   AS_IF([test x$ACCEL_ETNAVIV != xno],
-         [
-      AC_CHECK_LIB([etnaviv], [etna_bo_from_dmabuf],
-                   [DUMMY=y],
-                   [AC_MSG_ERROR([etnaviv (GALcore kernel driver) support requires etna_bo_from_dmabuf()])])
-      AC_CHECK_LIB([etnaviv], [etna_bo_from_usermem_prot],
-                   [DUMMY=y],
-                   [AC_MSG_ERROR([etnaviv (GALcore kernel driver) support requires etna_bo_from_usermem_prot()])])
-   ])
    LDFLAGS="$saved_LDFLAGS"
    CFLAGS="$saved_CFLAGS"
    AS_IF([test x$PKGCFG_ETNAVIV != xyes], [ETNAVIV_LIBS+=" -letnaviv"])
 ])
-AC_MSG_CHECKING([whether to build Etnaviv (GALcore kernel driver) acceleration support])
-AS_IF([test x$ACCEL_ETNAVIV = xyes],
-      [AC_DEFINE(HAVE_ACCEL_ETNAVIV,1,[Enable Etnaviv (GALcore kernel driver) acceleration support])
-       DRIVERS="etnaviv_gpu $DRIVERS"])
-AM_CONDITIONAL(HAVE_ACCEL_ETNAVIV, test x$ACCEL_ETNAVIV = xyes)
-AC_MSG_RESULT([$ACCEL_ETNAVIV])
 
 AC_MSG_CHECKING([whether to build Etnaviv (DRM kernel driver) acceleration support])
 AS_IF([test x$ACCEL_ETNADRM = xyes],
@@ -232,14 +143,14 @@ AC_ARG_ENABLE(dri2, AC_HELP_STRING([--disable-dri2],
 		[DRI2=auto])
 
 AC_ARG_ENABLE(dri3, AC_HELP_STRING([--disable-dri3],
-		[Disable DRI3 support [[default=disabled]]]),
+		[Disable DRI3 support [[default=auto]]]),
 		[DRI3="$enableval"],
-		[DRI3=no])
+		[DRI3=auto])
 
 AC_ARG_ENABLE(present, AC_HELP_STRING([--disable-present],
-		[Disable PRESENT support [[default=disabled]]]),
+		[Disable PRESENT support [[default=auto]]]),
 		[PRESENT="$enableval"],
-		[PRESENT=no])
+		[PRESENT=auto])
 
 # Checks for pkg-config packages
 PKG_CHECK_MODULES(XORG, [xorg-server >= 1.9.99.1 xproto fontsproto pixman-1])
@@ -327,5 +238,4 @@ AC_OUTPUT([
 	etnaviv/Makefile
 	man/Makefile
 	src/Makefile
-	vivante/Makefile
 ])

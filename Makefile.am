@@ -19,15 +19,4 @@
 #  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = common man src
-
-if HAVE_ACCEL_ETNAVIV
-SUBDIRS += etnaviv
-else
-if HAVE_ACCEL_ETNADRM
-SUBDIRS += etnaviv
-endif
-endif
-if HAVE_ACCEL_GALCORE
-SUBDIRS += vivante
-endif
+SUBDIRS = common man src etnaviv
