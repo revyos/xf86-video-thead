@@ -75,24 +75,8 @@ AC_ARG_WITH(xorg-module-dir,
             [moduledir="$withval"],
             [moduledir="$libdir/xorg/modules"])
 
-# Etnaviv GPU acceleration
-AC_ARG_ENABLE(etnadrm,
-	      AC_HELP_STRING([--disable-etnadrm],
-			     [Disable Etnaviv (DRM kernel driver) acceleration support [[default=enabled]]]),
-	      [ACCEL_ETNADRM="$enableval"],
-	      [ACCEL_ETNADRM=auto])
-
-AS_IF([test x$ACCEL_ETNADRM != xno],
-      [
-   CFLAGS="$CFLAGS -I$srcdir/etna_viv/src/etnaviv"
-])
-
-AC_MSG_CHECKING([whether to build Etnaviv (DRM kernel driver) acceleration support])
-AS_IF([test x$ACCEL_ETNADRM = xyes],
-      [AC_DEFINE(HAVE_ACCEL_ETNADRM,1,[Enable Etnaviv (DRM kernel driver) acceleration support])
-       DRIVERS="etnadrm_gpu $DRIVERS"])
-AM_CONDITIONAL(HAVE_ACCEL_ETNADRM, test x$ACCEL_ETNADRM = xyes)
-AC_MSG_RESULT([$ACCEL_ETNADRM])
+AC_DEFINE(HAVE_ACCEL_ETNADRM,1,[Enable Etnaviv (DRM kernel driver) acceleration support])
+DRIVERS="etnadrm_gpu $DRIVERS"
 
 AC_ARG_ENABLE(dri2, AC_HELP_STRING([--disable-dri2],
 		[Disable DRI support [[default=auto]]]),
@@ -183,6 +167,6 @@ AC_SUBST([DRIVERS])
 AC_OUTPUT([
 	Makefile
 	common/Makefile
-	etnaviv/Makefile
+	etnadrm/Makefile
 	src/Makefile
 ])

@@ -16,7 +16,8 @@
 AM_CFLAGS = $(filter-out -Wnested-externs -Wcast-qual -Wredundant-decls \
 	-Werror=write-strings -Wshadow,$(CWARNFLAGS)) \
 	$(XORG_CFLAGS) $(ETNAVIV_CFLAGS) $(DRM_CFLAGS) $(UDEV_CFLAGS) \
-	-I$(top_srcdir)/src -iquote $(top_srcdir)/common
+	-I$(top_srcdir)/src -iquote $(top_srcdir)/common \
+	-I$(top_srcdir)/etna_viv/src -I$(top_srcdir)/etna_viv/attic
 
 ETNA_COMMON_SOURCES = \
 	etnaviv.c \
@@ -51,7 +52,6 @@ ETNA_COMMON_SOURCES += \
 	etnaviv_dri3.h
 endif
 
-if HAVE_ACCEL_ETNADRM
 etnadrm_gpu_la_LTLIBRARIES = etnadrm_gpu.la
 etnadrm_gpu_la_LDFLAGS = -module -avoid-version
 etnadrm_gpu_la_LIBADD = \
@@ -64,4 +64,3 @@ etnadrm_gpu_la_SOURCES = \
 	etnadrm.c \
 	etnadrm.h \
 	etnaviv_drm.h
-endif
