@@ -29,7 +29,6 @@ armada_drv_la_SOURCES = armada_accel.h \
 			armada_module.c \
 			armada_drm.c \
 			armada_drm.h \
-			armada_drm_xv.c \
 			armada_ioctl.h \
 			common_drm.c \
 			common_drm.h \

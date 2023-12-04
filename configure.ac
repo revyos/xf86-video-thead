@@ -184,6 +184,5 @@ AC_OUTPUT([
 	Makefile
 	common/Makefile
 	etnaviv/Makefile
-	man/Makefile
 	src/Makefile
 ])

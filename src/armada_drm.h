@@ -36,11 +36,7 @@ struct all_drm_info {
 };
 
 enum {
-	OPTION_XV_ACCEL,
-	OPTION_XV_PREFEROVL,
-	OPTION_XV_DISPRIMARY,
 	OPTION_USE_GPU,
-	OPTION_USE_KMS_BO,
 	OPTION_ACCEL_MODULE,
 };
 
@@ -51,9 +47,6 @@ extern const OptionInfoRec armada_drm_options[];
 
 /* DRM core support */
 Bool armada_drm_init_screen(ScrnInfoPtr pScrn);
-
-/* DRM Xv support */
-Bool armada_drm_XvInit(ScrnInfoPtr pScrn);
 
 Bool armada_load_accelerator(ScrnInfoPtr pScrn, const char *module);
 const struct armada_accel_ops *armada_get_accelerator(void);

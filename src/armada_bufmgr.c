@@ -14,7 +14,6 @@
 
 #include "libdrm_lists.h"
 #include "armada_bufmgr.h"
-#include "armada_ioctl.h"
 
 #ifndef container_of
 #define container_of(ptr, type, member) ({ \
@@ -111,32 +110,6 @@ struct drm_mode_map_dumb {
 };
 #define DRM_IOCTL_MODE_MAP_DUMB    DRM_IOWR(0xB3, struct drm_mode_map_dumb)
 #endif
-
-/* Given a width and bpp, return the pitch of a bo */
-static unsigned armada_bo_pitch(unsigned width, unsigned bpp)
-{
-    unsigned pitch = bpp != 4 ? width * ((bpp + 7) / 8) : width / 2;
-
-    /* 88AP510 spec recommends pitch be a multiple of 128 */
-    return (pitch + 127) & ~127;
-}
-
-/* Given the pitch and height, return the allocated size in bytes of a bo */
-static size_t armada_bo_size(unsigned pitch, unsigned height)
-{
-    return pitch * height;
-}
-
-static size_t armada_bo_round_size(size_t size)
-{
-    if (size > 1048576)
-        size = (size + 1048575) & ~1048575;
-    else if (size > 65536)
-        size = (size + 65535) & ~65535;
-    else
-        size = (size + 4095) & ~4095;
-    return size;
-}
 
 static int armada_gem_handle_close(int fd, uint32_t handle)
 {
@@ -239,20 +212,6 @@ static void armada_bo_cache_clean(struct armada_bo_cache *cache, time_t time)
     }
 }
 
-static struct armada_bo *armada_bo_bucket_get(struct armada_bucket *bucket, size_t size)
-{
-    struct armada_bo *bo = NULL;
-
-    if (!DRMLISTEMPTY(&bucket->head)) {
-        drmMMListHead *entry = bucket->head.next;
-
-        bo = DRMLISTENTRY(struct armada_bo, entry, bucket);
-        DRMLISTDEL(&bo->bucket);
-        DRMLISTDEL(&bo->free);
-    }
-    return bo;
-}
-
 static void armada_bo_cache_put(struct armada_bo *bo)
 {
     struct armada_bo_cache *cache = &bo->mgr->cache;
@@ -272,127 +231,6 @@ static void armada_bo_cache_put(struct armada_bo *bo)
         return;
     }
     armada_bo_free(bo);
-}
-
-struct drm_armada_bo *drm_armada_bo_create(struct drm_armada_bufmgr *mgr,
-    unsigned w, unsigned h, unsigned bpp)
-{
-    struct drm_armada_gem_create arg;
-    struct armada_bucket *bucket;
-    struct armada_bo *bo;
-    unsigned pitch;
-    size_t alloc_size;
-    int fd = mgr->fd;
-    int ret;
-
-    pitch = armada_bo_pitch(w, bpp);
-    alloc_size = armada_bo_size(pitch, h);
-
-    /* Try to find a bucket for this allocation */
-    bucket = armada_find_bucket(&mgr->cache, alloc_size);
-    if (bucket) {
-        /* Can we allocate from our cache? */
-        bo = armada_bo_bucket_get(bucket, alloc_size);
-        if (bo) {
-            bo->bo.size = pitch * h;
-            bo->bo.pitch = pitch;
-            bo->ref = 1;
-            return &bo->bo;
-        }
-
-        /* Otherwise, allocate a bo of the bucket size */
-        alloc_size = bucket->size;
-    } else {
-        /* No bucket, so round the size up according to our old rules */
-        alloc_size = armada_bo_round_size(alloc_size);
-    }
-
-    /* No, create a new bo */
-    bo = calloc(1, sizeof *bo);
-    if (!bo)
-        return NULL;
-
-    memset(&arg, 0, sizeof(arg));
-    arg.size = alloc_size;
-
-    ret = drmIoctl(fd, DRM_IOCTL_ARMADA_GEM_CREATE, &arg);
-    if (ret) {
-        free(bo);
-        return NULL;
-    }
-
-    bo->bo.ref = 1;
-    bo->bo.handle = arg.handle;
-    bo->bo.size = pitch * h;
-    bo->bo.pitch = pitch;
-    bo->bo.type = DRM_ARMADA_BO_SHMEM;
-    bo->alloc_size = alloc_size;
-    bo->ref = 1;
-    bo->mgr = mgr;
-    bo->reusable = 1;
-
-    /* Add it to the handle hash table */
-    assert(drmHashInsert(mgr->handle_hash, bo->bo.handle, bo) == 0);
-
-    return &bo->bo;
-}
-
-struct drm_armada_bo *drm_armada_bo_create_size(struct drm_armada_bufmgr *mgr,
-    size_t alloc_size)
-{
-    struct drm_armada_gem_create arg;
-    struct armada_bucket *bucket;
-    struct armada_bo *bo;
-    int fd = mgr->fd;
-    int ret;
-
-    /* Try to find a bucket for this allocation */
-    bucket = armada_find_bucket(&mgr->cache, alloc_size);
-    if (bucket) {
-        /* Can we allocate from our cache? */
-        bo = armada_bo_bucket_get(bucket, alloc_size);
-        if (bo) {
-            bo->bo.size = alloc_size;
-            bo->bo.pitch = 1;
-            bo->ref = 1;
-            return &bo->bo;
-        }
-
-        /* Otherwise, allocate a bo of the bucket size */
-        alloc_size = bucket->size;
-    } else {
-        /* No bucket, so round the size up according to our old rules */
-        alloc_size = armada_bo_round_size(alloc_size);
-    }
-
-    /* No, create a new bo */
-    bo = calloc(1, sizeof *bo);
-    if (!bo)
-        return NULL;
-
-    memset(&arg, 0, sizeof(arg));
-    arg.size = alloc_size;
-
-    ret = drmIoctl(fd, DRM_IOCTL_ARMADA_GEM_CREATE, &arg);
-    if (ret) {
-        free(bo);
-        return NULL;
-    }
-
-    bo->bo.ref = 1;
-    bo->bo.handle = arg.handle;
-    bo->bo.size = alloc_size;
-    bo->bo.pitch = 1;
-    bo->bo.type = DRM_ARMADA_BO_SHMEM;
-    bo->alloc_size = alloc_size;
-    bo->ref = 1;
-    bo->mgr = mgr;
-    bo->reusable = 1;
-
-    /* Add it to the handle hash table */
-    assert(drmHashInsert(mgr->handle_hash, bo->bo.handle, bo) == 0);
-
-    return &bo->bo;
 }
 
 static struct armada_bo *drm_armada_bo_lookup_or_create(
@@ -597,19 +435,6 @@ int drm_armada_bo_map(struct drm_armada_bo *dbo)
 
         if (map == MAP_FAILED)
             return -1;
-    } else if (bo->bo.type == DRM_ARMADA_BO_SHMEM) {
-        struct drm_armada_gem_mmap arg;
-
-        memset(&arg, 0, sizeof(arg));
-        arg.handle = bo->bo.handle;
-        arg.offset = 0;
-        arg.size = bo->alloc_size;
-
-        ret = drmIoctl(fd, DRM_IOCTL_ARMADA_GEM_MMAP, &arg);
-        if (ret)
-            return -1;
-
-        map = (void *)(uintptr_t)arg.addr;
     } else {
         errno = EINVAL;
         return -1;
@@ -618,22 +443,6 @@ int drm_armada_bo_map(struct drm_armada_bo *dbo)
     bo->bo.ptr = map;
 
     return 0;
-}
-
-int drm_armada_bo_subdata(struct drm_armada_bo *dbo, unsigned long offset,
-    unsigned long size, const void *data)
-{
-    struct armada_bo *bo = to_armada_bo(dbo);
-    struct drm_armada_gem_pwrite arg;
-    int fd = bo->mgr->fd;
-
-    memset(&arg, 0, sizeof(arg));
-    arg.ptr = (uint64_t)(uintptr_t)data;
-    arg.handle = bo->bo.handle;
-    arg.offset = offset;
-    arg.size = size;
-
-    return drmIoctl(fd, DRM_IOCTL_ARMADA_GEM_PWRITE, &arg);
 }
 
 int drm_armada_cache_reap(struct drm_armada_bufmgr *mgr)

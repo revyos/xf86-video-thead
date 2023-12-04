@@ -24,10 +24,6 @@ int drm_armada_cache_reap(struct drm_armada_bufmgr *mgr);
 int drm_armada_init(int fd, struct drm_armada_bufmgr **mgr);
 void drm_armada_fini(struct drm_armada_bufmgr *);
 
-struct drm_armada_bo *drm_armada_bo_create(struct drm_armada_bufmgr *,
-    unsigned w, unsigned h, unsigned bpp);
-struct drm_armada_bo *drm_armada_bo_create_size(struct drm_armada_bufmgr *,
-    size_t);
 struct drm_armada_bo *drm_armada_bo_dumb_create(struct drm_armada_bufmgr *,
     unsigned w, unsigned h, unsigned bpp);
 
@@ -46,7 +42,5 @@ struct drm_armada_bo *drm_armada_bo_from_fd(struct drm_armada_bufmgr *mgr,
 int drm_armada_bo_map(struct drm_armada_bo *bo);
 void drm_armada_bo_get(struct drm_armada_bo *bo);
 void drm_armada_bo_put(struct drm_armada_bo *bo);
-int drm_armada_bo_subdata(struct drm_armada_bo *bo, unsigned long offset,
-    unsigned long size, const void *data);
 
 #endif
