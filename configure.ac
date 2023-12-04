@@ -82,52 +82,9 @@ AC_ARG_ENABLE(etnadrm,
 	      [ACCEL_ETNADRM="$enableval"],
 	      [ACCEL_ETNADRM=auto])
 
-AC_ARG_WITH(etnaviv-source,
-            AC_HELP_STRING([--with-etnaviv-source=PATH],
-                           [specify directory for etnaviv source tree [[default=unset]]]),
-            [etnaviv_source="$withval"])
-
 AS_IF([test x$ACCEL_ETNADRM != xno],
       [
-   AS_IF([test x$etnaviv_source != x],
-         [
-      AC_MSG_CHECKING([location of etnaviv hardware headers])
-      AS_IF([test -f "$etnaviv_source/src/etnaviv/common.xml.h"],
-            [libetnaviv_includes="$etnaviv_source/src"],
-            [AC_MSG_ERROR([Could not find libetnaviv hardware headers])])
-      AC_MSG_RESULT([$libetnaviv_includes])
-      AC_MSG_CHECKING([location of libetnaviv source tree])
-      AS_IF([test -f "$etnaviv_source/src/etnaviv/etna.h"],
-            [libetnaviv_source="$etnaviv_source/src"],
-            [
-         AS_IF([test -f "$etnaviv_source/attic/etnaviv/etna.h"],
-               [libetnaviv_source="$etnaviv_source/attic"],
-               [
-                  AC_MSG_ERROR([Could not find libetnaviv source within $etnaviv_source])
-               ])
-            ])
-      ETNAVIV_CFLAGS="-I$libetnaviv_source -I$libetnaviv_includes"
-      ETNAVIV_LIBS="-L$libetnaviv_source/etnaviv"
-      AC_MSG_RESULT([$libetnaviv_source])
-         ],
-         [
-           AS_IF([test x$etnaviv_include = x],
-           [
-             PKG_CHECK_MODULES(ETNAVIV, [libetnaviv >= 1.0.0], [PKGCFG_ETNAVIV=yes], [PKGCFG_ETNAVIV=no])
-           ],
-           [
-             ETNAVIV_CFLAGS="-I$etnaviv_include"
-             ETNAVIV_LIBS="-L$etnaviv_lib"
-           ])
-         ])
-   saved_LDFLAGS="$LDFLAGS"
-   saved_CFLAGS="$CFLAGS"
-   LDFLAGS="$LDFLAGS $ETNAVIV_LIBS"
-   CFLAGS="$CFLAGS $ETNAVIV_CFLAGS"
-   AS_IF([test x$ACCEL_ETNADRM = xauto], [ACCEL_ETNADRM=yes], [ACCEL_ETNADRM=no])
-   LDFLAGS="$saved_LDFLAGS"
-   CFLAGS="$saved_CFLAGS"
-   AS_IF([test x$PKGCFG_ETNAVIV != xyes], [ETNAVIV_LIBS+=" -letnaviv"])
+   CFLAGS="$CFLAGS -I$srcdir/etna_viv/src/etnaviv"
 ])
 
 AC_MSG_CHECKING([whether to build Etnaviv (DRM kernel driver) acceleration support])
@@ -163,15 +120,6 @@ XORG_DRIVER_CHECK_EXT(XV, videoproto)
 
 # Obtain compilter/linker options for the driver dependencies
 PKG_CHECK_MODULES(DRM, [libdrm >= 2.4.47])
-PKG_CHECK_MODULES(DRMARMADA, [libdrm_armada >= 2.0.0])
-
-save_LDFLAGS="$LDFLAGS"
-LDFLAGS="$LDFLAGS $DRMARMADA_LDFLAGS"
-AC_CHECK_LIB([drm_armada], [drm_armada_bo_create_size],
-	     [AC_DEFINE(HAVE_DRM_ARMADA_BO_CREATE_SIZE,1,[Use drm_armada_bo_create_size API])])
-AC_CHECK_LIB([drm_armada], [drm_armada_cache_reap],
-             [AC_DEFINE(HAVE_DRM_ARMADA_CACHE_REAP,1,[Use drm_armada_cache_reap API])])
-LDFLAGS="$save_LDFLAGS"
 
 PKG_CHECK_MODULES(DRI2, [dri2proto >= 2.6], , DRI2=no)
 

@@ -15,7 +15,7 @@
 # which can conflict - index, range, etc.
 AM_CFLAGS = $(filter-out -Wnested-externs -Wcast-qual -Wredundant-decls \
 	-Werror=write-strings -Wshadow,$(CWARNFLAGS)) \
-	$(XORG_CFLAGS) $(ETNAVIV_CFLAGS) $(DRMARMADA_CFLAGS) $(UDEV_CFLAGS) \
+	$(XORG_CFLAGS) $(ETNAVIV_CFLAGS) $(DRM_CFLAGS) $(UDEV_CFLAGS) \
 	-I$(top_srcdir)/src -iquote $(top_srcdir)/common
 
 ETNA_COMMON_SOURCES = \

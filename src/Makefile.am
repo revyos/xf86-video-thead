@@ -15,15 +15,17 @@
 # which can conflict - index, range, etc.
 AM_CFLAGS = $(filter-out -Wnested-externs -Wcast-qual -Wredundant-decls \
 	-Werror=write-strings -Wshadow,$(CWARNFLAGS)) \
-	$(XORG_CFLAGS) $(DRMARMADA_CFLAGS) $(UDEV_CFLAGS) \
+	$(XORG_CFLAGS) $(DRM_CFLAGS) $(UDEV_CFLAGS) \
 	-iquote $(top_srcdir)/common
 
 armada_drv_la_LTLIBRARIES = armada_drv.la
 armada_drv_la_LDFLAGS = -module -avoid-version
-armada_drv_la_LIBADD = $(DRMARMADA_LIBS) $(UDEV_LIBS) \
+armada_drv_la_LIBADD = $(DRM_LIBS) $(UDEV_LIBS) \
 			$(top_builddir)/common/libcommon.la
 armada_drv_ladir = @moduledir@/drivers
 armada_drv_la_SOURCES = armada_accel.h \
+			armada_bufmgr.c \
+			armada_bufmgr.h \
 			armada_module.c \
 			armada_drm.c \
 			armada_drm.h \
