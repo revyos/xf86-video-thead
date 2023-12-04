@@ -21,12 +21,12 @@
 # Process this file with autoconf to produce a configure script
 
 AC_PREREQ(2.57)
-AC_INIT([xf86-video-armada],
+AC_INIT([xf86-video-thead],
 	[0.0.0],
 	[],
-	[xf86-video-armada])
+	[xf86-video-thead])
 
-DRIVER_NAME=armada
+DRIVER_NAME=thead
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADER([config.h])

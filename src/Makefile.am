@@ -18,12 +18,12 @@ AM_CFLAGS = $(filter-out -Wnested-externs -Wcast-qual -Wredundant-decls \
 	$(XORG_CFLAGS) $(DRM_CFLAGS) $(UDEV_CFLAGS) \
 	-iquote $(top_srcdir)/common
 
-armada_drv_la_LTLIBRARIES = armada_drv.la
-armada_drv_la_LDFLAGS = -module -avoid-version
-armada_drv_la_LIBADD = $(DRM_LIBS) $(UDEV_LIBS) \
+thead_drv_la_LTLIBRARIES = thead_drv.la
+thead_drv_la_LDFLAGS = -module -avoid-version
+thead_drv_la_LIBADD = $(DRM_LIBS) $(UDEV_LIBS) \
 			$(top_builddir)/common/libcommon.la
-armada_drv_ladir = @moduledir@/drivers
-armada_drv_la_SOURCES = armada_accel.h \
+thead_drv_ladir = @moduledir@/drivers
+thead_drv_la_SOURCES = armada_accel.h \
 			armada_bufmgr.c \
 			armada_bufmgr.h \
 			armada_module.c \
@@ -37,11 +37,11 @@ armada_drv_la_SOURCES = armada_accel.h \
 			common_drm_helper.h \
 			common_drm_plane.c
 if HAVE_DRI2
-armada_drv_la_SOURCES += \
+thead_drv_la_SOURCES += \
 			common_drm_dri2.c \
 			common_drm_dri2.h
 endif
 
 if HAVE_PRESENT
-armada_drv_la_SOURCES += common_present.c
+thead_drv_la_SOURCES += common_present.c
 endif

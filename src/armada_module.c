@@ -23,8 +23,8 @@
 #include "utils.h"
 
 #define ARMADA_VERSION		4000
-#define ARMADA_NAME		"armada"
-#define ARMADA_DRIVER_NAME	"armada"
+#define ARMADA_NAME		"thead"
+#define ARMADA_DRIVER_NAME	"thead"
 
 #define DRM_MODULE_NAMES	"vs-drm"
 #define DRM_DEFAULT_BUS_ID	NULL
@@ -44,12 +44,6 @@ static const OptionInfoRec * const options[] = {
 static const char *armada_drm_accelerators[] = {
 #ifdef HAVE_ACCEL_ETNADRM
 	"etnadrm_gpu",
-#endif
-#ifdef HAVE_ACCEL_ETNAVIV
-	"etnaviv_gpu",
-#endif
-#ifdef HAVE_ACCEL_GALCORE
-	"vivante_gpu",
 #endif
 	NULL,
 };
@@ -351,7 +345,7 @@ static pointer armada_setup(pointer module, pointer opts, int *errmaj,
 }
 
 static XF86ModuleVersionInfo armada_version = {
-	.modname = "armada",
+	.modname = "thead",
 	.vendor = MODULEVENDORSTRING,
 	._modinfo1_ = MODINFOSTRING1,
 	._modinfo2_ = MODINFOSTRING2,
@@ -365,7 +359,7 @@ static XF86ModuleVersionInfo armada_version = {
 	.checksum = { 0, 0, 0, 0 },
 };
 
-_X_EXPORT XF86ModuleData armadaModuleData = {
+_X_EXPORT XF86ModuleData theadModuleData = {
 	.vers = &armada_version,
 	.setup = armada_setup,
 };
