@@ -31,7 +31,7 @@
 #include "utils.h"
 
 #define CURSOR_MAX_WIDTH	64
-#define CURSOR_MAX_HEIGHT	32
+#define CURSOR_MAX_HEIGHT	64
 
 const OptionInfoRec armada_drm_options[] = {
 	{ OPTION_USE_GPU,	"UseGPU",	   OPTV_BOOLEAN, {0}, FALSE },
@@ -168,7 +168,7 @@ static void armada_drm_crtc_load_cursor_argb(xf86CrtcPtr crtc, CARD32 *image)
 	struct common_drm_info *drm = GET_DRM_INFO(crtc->scrn);
 	struct drm_armada_bo *bo = drmc->cursor_data;
 
-	if (drm_armada_bo_map(bo)) {
+	if (!drm_armada_bo_map(bo)) {
 		memcpy(bo->ptr, image,
 		       drm->cursor_max_width * drm->cursor_max_height * 4);
 	}
