@@ -26,45 +26,29 @@
 #include "misyncshm.h"
 #include "compat-api.h"
 
+#include "common_drm.h"
+
 #include "etnaviv_accel.h"
 #include "etnaviv_dri3.h"
 
 #include <etnaviv/etna_bo.h>
 #include "etnaviv_compat.h"
 
-static Bool etnaviv_dri3_authorise(struct etnaviv *etnaviv, int fd)
-{
-	struct stat st;
-	drm_magic_t magic;
-
-	if (fstat(fd, &st) || !S_ISCHR(st.st_mode))
-		return FALSE;
-
-	/*
-	 * If the device is a render node, we don't need to auth it.
-	 * Render devices start at minor number 128 and up, though it
-	 * would be nice to have some other test for this.
-	 */
-	if (st.st_rdev & 0x80)
-		return TRUE;
-
-	return drmGetMagic(fd, &magic) == 0 &&
-	       drmAuthMagic(etnaviv->conn->fd, magic) == 0;
-}
-
 static int etnaviv_dri3_open(ScreenPtr pScreen, RRProviderPtr provider, int *o)
 {
-	struct etnaviv *etnaviv = etnaviv_get_screen_priv(pScreen);
+	ScrnInfoPtr pScrn = xf86ScreenToScrn(pScreen);
+	struct common_drm_info *drm = GET_DRM_INFO(pScrn);
+	char *name;
 	int fd;
 
-	fd = open(etnaviv->render_node, O_RDWR | O_CLOEXEC);
-	if (fd < 0)
+	name = drmGetDeviceNameFromFd(drm->fd);
+	if (!name)
 		return BadAlloc;
 
-	if (!etnaviv_dri3_authorise(etnaviv, fd)) {
-		close(fd);
-		return BadMatch;
-	}
+	fd = open(name, O_RDWR | O_CLOEXEC);
+	drmFree(name);
+	if (fd < 0)
+		return BadAlloc;
 
 	*o = fd;
 
@@ -103,25 +87,6 @@ static dri3_screen_info_rec etnaviv_dri3_info = {
 
 Bool etnaviv_dri3_ScreenInit(ScreenPtr pScreen)
 {
-	struct etnaviv *etnaviv = etnaviv_get_screen_priv(pScreen);
-	struct stat st;
-	char buf[64];
-
-	free((void *)etnaviv->render_node);
-
-	if (fstat(etnaviv->conn->fd, &st) || !S_ISCHR(st.st_mode))
-		return FALSE;
-
-	snprintf(buf, sizeof(buf), "%s/card%d", DRM_DIR_NAME,
-		 (unsigned int)st.st_rdev & 0x7f);
-
-	if (access(buf, F_OK))
-		return FALSE;
-
-	etnaviv->render_node = strdup(buf);
-	if (!etnaviv->render_node)
-		return FALSE;
-
 	if (!miSyncShmScreenInit(pScreen))
 		return FALSE;
 
