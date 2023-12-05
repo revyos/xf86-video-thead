@@ -1,7 +1,7 @@
-Source: xf86-video-armada
+Source: xserver-xorg-video-thead
 Section: x11
 Priority: optional
-Maintainer: Russell King <rmk+cubox@arm.linux.org.uk>
+Maintainer: Han Gao <gaohan@iscas.ac.cn>
 Build-Depends:
  debhelper (>= 8.1.2ubuntu2),
  dh-autoreconf,
@@ -13,23 +13,24 @@ Build-Depends:
  x11proto-render-dev,
  x11proto-video-dev,
  libdrm-dev (>= 2.4.23),
+ libgbm-dev,
  libudev-dev [linux-any],
  dpkg-dev (>= 1.14.17),
  automake,
  libtool,
  xutils-dev
-Standards-Version: 3.9.2
+Standards-Version: 4.6.2
 
-Package: xserver-xorg-video-armada
-Architecture: armel armhf
+Package: xserver-xorg-video-thead
+Architecture: riscv64
 Depends:
  ${misc:Depends},
  ${shlibs:Depends},
  ${xviddriver:Depends}
 Provides:
  ${xviddriver:Provides}
-Description: Xorg X server -- Armada display driver
- This package provides the driver for the Marvell Armada LCD controllers
+Description: Xorg X server -- TH1520 display driver
+ This package provides the driver for the TH1520
  with Vivante GCxxx acceleration.
  .
  More information about X.Org can be found at:
@@ -37,69 +38,4 @@ Description: Xorg X server -- Armada display driver
  <URL:http://xorg.freedesktop.org>
  <URL:http://lists.freedesktop.org/mailman/listinfo/xorg>
  .
- This package is built from the X.org xf86-video-armada driver module.
-
-Package: xserver-xorg-video-armada-etnaviv
-Architecture: armel armhf
-Depends:
- xserver-xorg-video-armada (= ${binary:Version}),
- ${misc:Depends},
- ${shlibs:Depends}
-Description: Xorg X server -- Armada DRM Etnaviv-based GPU acceleration
- This package provides the GPU driver for Vivante GPU acceleration using
- the Etnaviv library.
- .
- More information about X.Org can be found at:
- <URL:http://www.X.org>
- <URL:http://xorg.freedesktop.org>
- <URL:http://lists.freedesktop.org/mailman/listinfo/xorg>
- .
- This package is built from the X.org xf86-video-armada driver module.
-
-Package: xserver-xorg-video-armada-etnadrm
-Architecture: armel armhf
-Depends:
- xserver-xorg-video-armada (= ${binary:Version}),
- ${misc:Depends},
- ${shlibs:Depends}
-Description: Xorg X server -- Armada DRM Etnaviv-based GPU acceleration
- This package provides the GPU driver for Vivante GPU acceleration using
- the Etnaviv library.
- .
- More information about X.Org can be found at:
- <URL:http://www.X.org>
- <URL:http://xorg.freedesktop.org>
- <URL:http://lists.freedesktop.org/mailman/listinfo/xorg>
- .
- This package is built from the X.org xf86-video-armada driver module.
-
-Package: xserver-xorg-video-armada-vivante
-Architecture: armel armhf
-Depends:
- xserver-xorg-video-armada (= ${binary:Version}),
- ${misc:Depends},
- ${shlibs:Depends}
-Description: Xorg X server -- Armada DRM Vivante libGAL GPU acceleration
- This package provides the GPU driver for Vivante GPU acceleration using
- the Vivante libGAL closed source library.
- .
- More information about X.Org can be found at:
- <URL:http://www.X.org>
- <URL:http://xorg.freedesktop.org>
- <URL:http://lists.freedesktop.org/mailman/listinfo/xorg>
- .
- This package is built from the X.org xf86-video-armada driver module.
-
-Package: xserver-xorg-video-armada-dbg
-Section: debug
-Priority: extra
-Architecture: linux-any
-Depends:                                                                        
- ${misc:Depends},                                                               
-Multi-Arch: same
-Description: Xorg X server -- Armada display driver
- This package provides the driver for the Marvell Armada LCD controllers
- with Vivante GCxxx acceleration.
- .
- This package provides debugging symbols for the xserver-xorg-video-armada
- package.
+ This package is built from the X.org xf86-video-thead driver module.

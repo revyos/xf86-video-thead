@@ -1,5 +1,5 @@
-xf86-video-armada (0.0.0-1) precise; urgency=low
+xserver-xorg-video-thead (1.0.0) unstable; urgency=medium
 
-  * Initial release
+  * Init
 
- -- Russell King <rmk_cubox@arm.linux.org.uk>  Wed, 22 May 2013 22:59:30 +0100
+ -- Han Gao <gaohan@iscas.ac.cn>  Tue, 05 Dec 2023 17:43:11 +0800
