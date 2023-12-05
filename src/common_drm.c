@@ -863,7 +863,7 @@ Bool common_drm_PostScreenInit(ScreenPtr pScreen)
 
 	drm->hw_cursor = xf86ReturnOptValBool(drm->Options,
 					      OPTION_HW_CURSOR,
-					      drm->has_hw_cursor);
+					      FALSE);
 	if (drm->hw_cursor && !drm->has_hw_cursor) {
 		xf86DrvMsg(pScrn->scrnIndex, X_INFO,
 			   "No hardware cursor support - disabling hardware cursors\n");
