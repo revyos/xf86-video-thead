@@ -372,21 +372,25 @@ static const xf86OutputFuncsRec drm_output_funcs = {
 	.destroy = common_drm_conn_destroy,
 };
 
-/* Convert libdrm's connector type to Xorg name */
 static const char *const output_names[] = {
-	[DRM_MODE_CONNECTOR_Unknown]     = "None",
-	[DRM_MODE_CONNECTOR_VGA]         = "VGA",
-	[DRM_MODE_CONNECTOR_DVII]        = "DVI",
-	[DRM_MODE_CONNECTOR_DVID]        = "DVI",
-	[DRM_MODE_CONNECTOR_DVIA]        = "DVI",
-	[DRM_MODE_CONNECTOR_Composite]   = "Composite",
-	[DRM_MODE_CONNECTOR_SVIDEO]      = "TV",
-	[DRM_MODE_CONNECTOR_LVDS]        = "LVDS",
-	[DRM_MODE_CONNECTOR_Component]   = "CTV",
-	[DRM_MODE_CONNECTOR_9PinDIN]     = "DIN",
-	[DRM_MODE_CONNECTOR_DisplayPort] = "DP",
-	[DRM_MODE_CONNECTOR_HDMIA]       = "HDMI",
-	[DRM_MODE_CONNECTOR_HDMIB]       = "HDMI",
+    "None",
+    "VGA",
+    "DVI-I",
+    "DVI-D",
+    "DVI-A",
+    "Composite",
+    "SVIDEO",
+    "LVDS",
+    "Component",
+    "DIN",
+    "DP",
+    "HDMI",
+    "HDMI-B",
+    "TV",
+    "eDP",
+    "Virtual",
+    "DSI",
+    "DPI",
 };
 
 static const char *common_drm_output_name(uint32_t type)
@@ -436,7 +440,7 @@ void common_drm_conn_init(ScrnInfoPtr pScrn, uint32_t id)
 		return;
 	}
 
-	snprintf(name, sizeof(name), "%s%d",
+	snprintf(name, sizeof(name), "%s-%d",
 		 common_drm_output_name(koutput->connector_type),
 		 koutput->connector_type_id);
 
