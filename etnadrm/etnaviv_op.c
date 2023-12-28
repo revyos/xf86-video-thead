@@ -129,8 +129,18 @@ static void etnaviv_set_source_bo(struct etnaviv *etnaviv,
 	EL(VIVS_DE_SRC_STRIDE_STRIDE(buf->pitch));
 	EL(VIVS_DE_SRC_ROTATION_CONFIG_WIDTH(buf->width) | rot_cfg);
 	EL(src_cfg);
-	EL(VIVS_DE_SRC_ORIGIN_X(buf->offset.x) |
-	   VIVS_DE_SRC_ORIGIN_Y(buf->offset.y));
+	switch (buf->rotate) {
+	case DE_ROT_MODE_ROT0:
+	case DE_ROT_MODE_ROT180:
+		EL(VIVS_DE_SRC_ORIGIN_X(buf->offset.x) |
+		   VIVS_DE_SRC_ORIGIN_Y(buf->offset.y));
+		break;
+	case DE_ROT_MODE_ROT90:
+	case DE_ROT_MODE_ROT270:
+		EL(VIVS_DE_SRC_ORIGIN_X(buf->offset.y) |
+		   VIVS_DE_SRC_ORIGIN_Y(buf->offset.x));
+		break;
+	}
 	EL_END();
 }
 

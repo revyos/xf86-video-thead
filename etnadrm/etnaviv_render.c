@@ -487,7 +487,7 @@ static struct etnaviv_pixmap *etnaviv_acquire_drawable_picture(
 		}
 
 		/* Map the drawable source offsets to destination coords.
-		 * The GPU calculates the source coordinate using:
+		 * TODO: The GPU calculates the source coordinate using:
 		 * source coord = rotation(destination coord + source origin)
 		 * where rotation() rotates around the center point of the
 		 * source.  Hence, for a 90° anti-clockwise:
