@@ -1046,6 +1046,13 @@ static int etnaviv_export_name(ScreenPtr pScreen, uint32_t name)
 	return fd;
 }
 
+static void etnaviv_flush_queue(ScreenPtr pScreen)
+{
+	struct etnaviv *etnaviv = etnaviv_get_screen_priv(pScreen);
+	if (etnaviv_fence_batch_pending(&etnaviv->fence_head))
+		etnaviv_commit(etnaviv, FALSE);
+}
+
 const struct armada_accel_ops etnaviv_ops = {
 	.pre_init	= etnaviv_pre_init,
 	.screen_init	= etnaviv_ScreenInit,
@@ -1054,5 +1061,6 @@ const struct armada_accel_ops etnaviv_ops = {
 	.attach_name	= etnaviv_attach_name,
 	.free_pixmap	= etnaviv_free_pixmap,
 	.xv_init	= etnaviv_xv_init,
+	.flush_queue	= etnaviv_flush_queue,
 	.export_name	= etnaviv_export_name,
 };

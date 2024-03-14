@@ -33,6 +33,7 @@ struct armada_accel_ops {
 			       unsigned int tv_sec, unsigned int tv_usec,
 			       void *user_data);
 	XF86VideoAdaptorPtr (*xv_init)(ScreenPtr, unsigned int *);
+	void (*flush_queue)(ScreenPtr);
 	int (*export_name)(ScreenPtr, uint32_t);
 };
 
