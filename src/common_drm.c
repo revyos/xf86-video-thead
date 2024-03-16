@@ -1067,13 +1067,7 @@ xf86CrtcPtr common_drm_drawable_covering_crtc(DrawablePtr pDraw)
 
 	box_init(&box, pDraw->x, pDraw->y, pDraw->width, pDraw->height);
 
-	crtc = common_drm_covering_crtc(pScrn, &box, NULL, &crtcbox);
-
-	/* Make sure the CRTC is valid and this is the real front buffer */
-	if (crtc && crtc->rotatedData)
-		crtc = NULL;
-
-	return crtc;
+	return common_drm_covering_crtc(pScrn, &box, NULL, &crtcbox);
 }
 
 static inline uint32_t req_crtc(xf86CrtcPtr crtc)
