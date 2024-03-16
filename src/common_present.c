@@ -6,6 +6,8 @@
 
 #include "common_drm.h"
 #include "common_drm_helper.h"
+#include "armada_drm.h"
+#include "armada_accel.h"
 
 #include "present.h"
 
@@ -96,7 +98,13 @@ static void common_present_abort_vblank(RRCrtcPtr rr_crtc, uint64_t event_id,
 
 static void common_present_flush(WindowPtr window)
 {
-	/* Flush queued rendering - and wait for it? */
+	ScreenPtr pScreen = window->drawable.pScreen;
+	ScrnInfoPtr pScrn = xf86ScreenToScrn(pScreen);
+	struct armada_drm_info *arm = GET_ARMADA_DRM_INFO(pScrn);
+	const struct armada_accel_ops *ops = arm->accel_ops;
+
+	if (ops)
+		ops->flush_queue(pScreen);
 }
 
 //static Bool common_present_check_flip(RRCrtcPtr crtc, WindowPtr window,
