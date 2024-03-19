@@ -21,8 +21,6 @@ struct common_crtc_info {
 	void *cursor_data;
 	uint32_t cursor_handle;
 	uint32_t rotate_fb_id;
-	uint32_t last_seq;
-	uint64_t last_msc;
 	uint64_t swap_msc;
 	uint64_t swap_ust;
 	Bool has_cursor2;
