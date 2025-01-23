@@ -122,7 +122,7 @@ if test x$DRI2 = xyes; then
    AC_DEFINE(HAVE_DRI2,1,[Enable DRI2 driver support])
 fi
 
-PKG_CHECK_MODULES(DRI3, [dri3proto >= 1.0], , DRI3=no)
+PKG_CHECK_MODULES(DRI3, [dri3proto >= 1.2], , DRI3=no)
 if test x$DRI3 != xno; then
    save_CFLAGS=$CFLAGS
    CFLAGS="$XORG_CFLAGS $DRM_CFLAGS $DRI_CFLAGS $DRI2_CFLAGS $DRI3_CFLAGS"
